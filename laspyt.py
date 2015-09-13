@@ -190,13 +190,16 @@ def submitTrack(track):
       if (response.status != 200):
         error = "%s error" % response.status
       else:
-        data = ElementTree.fromstring(response.read())
-        if (data.attrib['status'] != "ok"):
-          error = data.find("error").text
-        else:
-          data = data.find("scrobbles").find("scrobble").find("ignoredMessage")
-          if (data.attrib['code'] != 0):
-            error = data.text
+        try:
+            data = ElementTree.fromstring(response.read())
+            if (data.attrib['status'] != "ok"):
+              error = data.find("error").text
+            else:
+              data = data.find("scrobbles").find("scrobble").find("ignoredMessage")
+              if (data.attrib['code'] != 0):
+                error = data.text
+        except ElementTree.ParseError as e:
+            print ("Warning: {}".format(e))
     finally:
       conn.close()
   return error
